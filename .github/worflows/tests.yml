@@ -1,0 +1,44 @@
+name: Extended Tests
+
+on:
+  schedule:
+    # Lancer les tests étendus tous les jours à 2h du matin
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Permettre le lancement manuel
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    
+    services:
+      # Si vous utilisez une base de données ou Redis
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+    
+    - name: Create necessary directories
+      run: |
+        mkdir -p models/trained logs/api_logs data/processed
+    
+    - name: Download test model (if available)
+      run: |
+        # Télécharger un modèle de test depuis votre storage
+        # wget -O models/trained/best_model.pkl ${{ secrets.TEST_MODEL_URL }}
+        echo "Test model setup"
+    
+    - name: Run integration tests
+      run: |
+        python -m

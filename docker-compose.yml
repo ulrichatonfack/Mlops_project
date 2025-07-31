@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: house_price_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+    command: >
+      sh -c "echo '🔄 Chargement du modèle...' &&
+             python -c 'from src.utils.model_utils import load_model_components; load_model_components()' &&
+             echo '✅ Modèle prêt !' &&
+             uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload"

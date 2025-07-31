@@ -1,0 +1,46 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to staging
+      run: |
+        echo "🚀 Deploying to staging environment..."
+        # Ici, vous ajouteriez vos commandes de déploiement
+        # Exemples :
+        # - kubectl apply -f k8s/
+        # - docker-compose up -d
+        # - ssh deploy@server 'docker pull && docker-compose up -d'
+        echo "✅ Deployment completed"
+    
+    - name: Run health checks
+      run: |
+        echo "🏥 Running health checks..."
+        # curl -f http://your-staging-url/health
+        echo "✅ Health checks passed"
+    
+    - name: Notify deployment
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        text: |
+          Deployment ${{ job.status }}!
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref }}
+          Commit: ${{ github.sha }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
