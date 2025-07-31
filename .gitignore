@@ -22,7 +22,6 @@ __pycache__/
 models/*.pkl
 models/trained/*.pkl
 models/trained/*.joblib
-data/raw/
 data/processed/
 
 *.DS_Store
